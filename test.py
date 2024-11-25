@@ -21,7 +21,6 @@ def per_test(test_file, ans_data, out_data):
                 for key, value in ans_data[i].items():
                     if key in out_data[i]:
                         if value != out_data[i][key]:
-
                             print(f"{test_file} test {Fore.RED}failed{Style.RESET_ALL}.")
                             print(f"Test aborted at PC = {out_data[i]['PC']}")
                             print(f"Expected: {key}:")
@@ -64,10 +63,15 @@ def cpu_test():
 
     """test each file"""
     for file_name in common_files:
-        with open(os.path.join(answer_dir, file_name), 'r') as file:
-            ans_data = yaml.safe_load(file)
-        with open(os.path.join(output_dir, file_name), 'r') as file:
-            out_data = yaml.safe_load(file)
+        try:
+            with open(os.path.join(answer_dir, file_name), 'r') as file:
+                ans_data = yaml.safe_load(file)
+            with open(os.path.join(output_dir, file_name), 'r') as file:
+                out_data = yaml.safe_load(file)
+        except yaml.YAMLError as e:
+            print(f"{Fore.RED}Error parsing YAML file {file_name}{Style.RESET_ALL}:\n {e}")
+            all_passed = False
+            break
 
         if per_test(file_name, ans_data, out_data):
             print(f"{file_name} test {Fore.GREEN}passed{Style.RESET_ALL}.")
